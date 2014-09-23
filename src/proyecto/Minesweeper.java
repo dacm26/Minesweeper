@@ -23,7 +23,7 @@ import javax.swing.Timer;
 public class Minesweeper {
 
     private static int width = 693;
-    private static int height = 475;
+    private static int height = 480;
     private static int mines = 50;
     private static int gameTime = 0;
     private static int numberOfSquaresX = 32;
