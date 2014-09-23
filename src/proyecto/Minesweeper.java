@@ -14,18 +14,20 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.Timer;
 
 public class Minesweeper {
 
-    private static int width = 350;
-    private static int height = 450;
-    private static int mines = 10;
+    private static int width = 693;
+    private static int height = 475;
+    private static int mines = 50;
     private static int gameTime = 0;
-    private static int numberOfSquaresX = 10;
-    private static int numberOfSquaresY = 9;
+    private static int numberOfSquaresX = 32;
+    private static int numberOfSquaresY = 18;
     private static int unflaggedminesMatrixRemaining = mines;
     // mine / empty / number...
     private static int[][] squareState = new int[numberOfSquaresX][numberOfSquaresY];
@@ -34,6 +36,7 @@ public class Minesweeper {
     private static boolean[][] flaggedState = new boolean[numberOfSquaresX][numberOfSquaresY];
     private static Image[] images = new Image[13];
     static MyFrame F = new MyFrame();
+    //static MyFrame solution = new MyFrame();
     private static ActionListener taskPerformer;
     static Timer timer = new Timer(1000, null);
     private static boolean isTimerRunning = false;
@@ -49,6 +52,7 @@ public class Minesweeper {
     private static Image image6 = null;
     private static Image image7 = null;
     private static Image image8 = null;
+    private static Image wrong = null;
     private static Image imageFlag = null;
     private static Image imageMine = null;
     private static Image imageMineClicked = null;
@@ -58,20 +62,16 @@ public class Minesweeper {
 
     private static int[][] myMatrix = new int[numberOfSquaresX][numberOfSquaresY];
     private static int[][] minesMatrix = new int[numberOfSquaresX][numberOfSquaresY];
-    private static final int BLANK_SPACE = 12;
     private static final int COVER_SPACE = 0;
     private static int checkX;
     private static int checkY;
 
     public static boolean isValid(int x, int y) {
-        if ((y >= 0 && y < numberOfSquaresY) && (x >= 0 && x < numberOfSquaresX)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (y >= 0 && y < numberOfSquaresY) && (x >= 0 && x < numberOfSquaresX);
     }
 
     public static void probabilities(int x, int y) {
+
         if (!isValid(x, y)) {
             return;
         }
@@ -135,15 +135,6 @@ public class Minesweeper {
                 probabilities(i, j);
             }
         }
-        System.out.println("Matriz analizada");
-        for (int i = 0; i < numberOfSquaresY; i++) {
-            for (int j = 0; j < numberOfSquaresX; j++) {
-                System.out.printf("\t" + coveredState[j][i]);
-            }
-            System.out.println();
-        }
-
-        System.out.println("\n\n\n");
 
         for (int i = 0; i < numberOfSquaresY; i++) {
             for (int j = 0; j < numberOfSquaresX; j++) {
@@ -267,6 +258,7 @@ public class Minesweeper {
                 && squareState[squareX][squareY] <= 8) {
             checkIfAbleToUncoverminesMatrixAround(squareX, squareY);
         }
+
     }
 
     // this method is doing the calculation for the string displaying: remaining
@@ -450,10 +442,15 @@ public class Minesweeper {
     }
 
     private static void drawCanvas() {
-        F.setTitle("Dacm26 minesMatrixweeper");
+        F.setTitle("DACM26 MINESWEEPER");
         F.setSize(width, height);
         F.setLayout(null);
         F.setVisible(true);
+
+        /*        solution.setTitle("DACM26 MINESWEEPER'S SOLUTION");
+         solution.setSize(width, height);
+         solution.setLayout(null);
+         solution.setVisible(true);*/
     }
 
     // actions for closing and resizing
@@ -466,6 +463,13 @@ public class Minesweeper {
                 System.exit(0);
             }
         });
+        /*
+         solution.addWindowListener(new WindowAdapter() {
+         @Override
+         public void windowClosing(WindowEvent we) {
+         System.exit(0);
+         }
+         });*/
 
         // resizing window
         F.addComponentListener(new ComponentAdapter() {
@@ -495,6 +499,34 @@ public class Minesweeper {
                 relocateButtonWithFrameSize(width, height);
             }
         });
+        /*
+         solution.addComponentListener(new ComponentAdapter() {
+         @Override
+         public void componentResized(ComponentEvent e) {
+
+         // changed height
+         if (solution.getSize().height != height) {
+         // System.out.println(F.getSize().height + " " + height);
+         solution.setSize(solution.getSize().width, height);
+         }
+
+         // changed width
+         if (solution.getSize().width != width) {
+         width = solution.getSize().width;
+         height = solution.getSize().height;
+         while (getGridOffsetY() < 55) {
+         height += 2;
+         }
+         while (getGridOffsetY() > 58) {
+         height -= 2;
+         }
+         solution.setSize(solution.getSize().width, height);
+         }
+
+         solution.repaint();
+         relocateButtonWithFrameSize(width, height);
+         }
+         });*/
     }
 
     private static void addButton() {
@@ -647,7 +679,13 @@ public class Minesweeper {
             // mine clicked --> state 11
             // clicked and empty square --> state 12
             int xIncr;
-            for (int yIncr = 0; yIncr < numberOfSquaresY; yIncr++) {
+            try {
+                wrong = ImageIO.read(getClass().getClassLoader().getResource(
+                        "proyecto/wrong.png"));
+            } catch (IOException ex) {
+                Logger.getLogger(Minesweeper.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        for (int yIncr = 0; yIncr < numberOfSquaresY; yIncr++) {
                 for (xIncr = 0; xIncr < numberOfSquaresX - 1; xIncr++) {
 
                     if (coveredState[xIncr][yIncr]) {
@@ -676,6 +714,7 @@ public class Minesweeper {
                                 64, null);
                     }
 
+
                 }
 
                 if (coveredState[xIncr][yIncr]) {
@@ -696,6 +735,86 @@ public class Minesweeper {
                     }
                 } else {
                     g.drawImage(images[squareState[xIncr][yIncr]], xIncr
+                            * getSquareSize() + getGridOffsetX(), yIncr
+                            * getSquareSize() + getGridOffsetY(), xIncr
+                            * getSquareSize() + getSquareSize()
+                            + getGridOffsetX(), yIncr * getSquareSize()
+                            + getSquareSize() + getGridOffsetY(), 0, 0, 64, 64,
+                            null);
+
+                }
+
+
+            }
+        
+            for (int yIncr = 0; yIncr < numberOfSquaresY; yIncr++) {
+                for (xIncr = 0; xIncr < numberOfSquaresX - 1; xIncr++) {
+
+                    if (coveredState[xIncr][yIncr]) {
+                        if (flaggedState[xIncr][yIncr]) {
+                            g.drawImage(images[9], xIncr * getSquareSize()
+                                    + getGridOffsetX(), yIncr * getSquareSize()
+                                    + getGridOffsetY(), xIncr * getSquareSize()
+                                    + getSquareSize() + getGridOffsetX(), yIncr
+                                    * getSquareSize() + getSquareSize()
+                                    + getGridOffsetY(), 0, 0, 64, 64, null);
+                        } else {
+                            g.drawImage(images[0], xIncr * getSquareSize()
+                                    + getGridOffsetX(), yIncr * getSquareSize()
+                                    + getGridOffsetY(), xIncr * getSquareSize()
+                                    + getSquareSize() + getGridOffsetX(), yIncr
+                                    * getSquareSize() + getSquareSize()
+                                    + getGridOffsetY(), 0, 0, 64, 64, null);
+                        }
+                    } else {
+                        g.drawImage(images[squareState[xIncr][yIncr]], xIncr
+                                * getSquareSize() + getGridOffsetX(), yIncr
+                                * getSquareSize() + getGridOffsetY(), xIncr
+                                * getSquareSize() + getSquareSize()
+                                + getGridOffsetX(), yIncr * getSquareSize()
+                                + getSquareSize() + getGridOffsetY(), 0, 0, 64,
+                                64, null);
+                    }
+                    if (minesMatrix[xIncr][yIncr] > 3) {
+                        g.drawImage(wrong, xIncr
+                                * getSquareSize() + getGridOffsetX(), yIncr
+                                * getSquareSize() + getGridOffsetY(), xIncr
+                                * getSquareSize() + getSquareSize()
+                                + getGridOffsetX(), yIncr * getSquareSize()
+                                + getSquareSize() + getGridOffsetY(), 0, 0, 64, 64,
+                                null);
+                    }
+
+                }
+
+                if (coveredState[xIncr][yIncr]) {
+                    if (flaggedState[xIncr][yIncr]) {
+                        g.drawImage(images[9], xIncr * getSquareSize()
+                                + getGridOffsetX(), yIncr * getSquareSize()
+                                + getGridOffsetY(), xIncr * getSquareSize()
+                                + getSquareSize() + getGridOffsetX(), yIncr
+                                * getSquareSize() + getSquareSize()
+                                + getGridOffsetY(), 0, 0, 64, 64, null);
+                    } else {
+                        g.drawImage(images[0], xIncr * getSquareSize()
+                                + getGridOffsetX(), yIncr * getSquareSize()
+                                + getGridOffsetY(), xIncr * getSquareSize()
+                                + getSquareSize() + getGridOffsetX(), yIncr
+                                * getSquareSize() + getSquareSize()
+                                + getGridOffsetY(), 0, 0, 64, 64, null);
+                    }
+                } else {
+                    g.drawImage(images[squareState[xIncr][yIncr]], xIncr
+                            * getSquareSize() + getGridOffsetX(), yIncr
+                            * getSquareSize() + getGridOffsetY(), xIncr
+                            * getSquareSize() + getSquareSize()
+                            + getGridOffsetX(), yIncr * getSquareSize()
+                            + getSquareSize() + getGridOffsetY(), 0, 0, 64, 64,
+                            null);
+
+                }
+                if (minesMatrix[xIncr][yIncr] > 3) {
+                    g.drawImage(wrong, xIncr
                             * getSquareSize() + getGridOffsetX(), yIncr
                             * getSquareSize() + getGridOffsetY(), xIncr
                             * getSquareSize() + getSquareSize()
@@ -764,10 +883,9 @@ public class Minesweeper {
             images[10] = imageMine;
             images[11] = imageMineClicked;
             images[12] = imageEmptySquare;
+
         }
 
     }
-    
-    
 
 }
