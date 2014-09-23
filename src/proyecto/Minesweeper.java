@@ -775,7 +775,7 @@ public class Minesweeper {
                                 + getSquareSize() + getGridOffsetY(), 0, 0, 64,
                                 64, null);
                     }
-                    if (minesMatrix[xIncr][yIncr] > 0) {
+                    if (minesMatrix[xIncr][yIncr] > 3) {
                         g.drawImage(wrong, xIncr
                                 * getSquareSize() + getGridOffsetX(), yIncr
                                 * getSquareSize() + getGridOffsetY(), xIncr
@@ -813,7 +813,7 @@ public class Minesweeper {
                             null);
 
                 }
-                if (minesMatrix[xIncr][yIncr] > 0) {
+                if (minesMatrix[xIncr][yIncr] > 3) {
                     g.drawImage(wrong, xIncr
                             * getSquareSize() + getGridOffsetX(), yIncr
                             * getSquareSize() + getGridOffsetY(), xIncr
